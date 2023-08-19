@@ -3,20 +3,20 @@ import java.util.Date
 data class Note(
     val noteId: Int,
     val title: String,
-    val text: String,
-    val ownerId: Int,
+    var text: String,
+    var ownerId: Int,
     val noteDeleteId: Boolean = false,
-    val date: Date
+    var date: Date
 )
 
 data class Comment(
     val commentId: Int,
-    val text: String,
-    val ownerId: Int,
-    val commentDeleteId: Boolean = false,
+    var text: String,
+    var ownerId: Int,
+    var commentDeleteId: Boolean = false,
     val noteId: Int,
-    val ownerCommentId: Int,
-    val date: Date
+    var ownerCommentId: Int,
+    var date: Date
 )
 
 object NoteService {
@@ -25,12 +25,12 @@ object NoteService {
     private val comments = mutableListOf<Comment>()
     private var count = 0
 
-    private fun addNote(note: Note): Note {
+    fun addNote(note: Note): Note {
         notes += note.copy(noteId = count++)
         return notes.last()
     }
 
-    private fun createComment(noteId: Int, comment: Comment): Comment {
+    fun createComment(noteId: Int, comment: Comment): Comment {
         for ((index, note) in notes.withIndex()) {
             if (note.noteId == noteId) {
                 comments += comment
@@ -40,12 +40,12 @@ object NoteService {
         throw CommentNotFoundException("Comment not found")
     }
 
-    private fun editNote(newNote: Note): Boolean {
+    fun editNote(newNote: Note): Boolean {
         for ((index, note) in notes.withIndex()) {
             if (note.noteId == newNote.noteId && note.noteDeleteId) {
-                note.ownerId == newNote.ownerId
-                note.date == newNote.date
-                note.text == newNote.text
+                note.ownerId = newNote.ownerId
+                note.date = newNote.date
+                note.text = newNote.text
                 notes[index] = newNote.copy()
                 return true
             }
@@ -53,13 +53,13 @@ object NoteService {
         return false
     }
 
-    private fun editComment(newComment: Comment, note: Note): Boolean {
+    fun editComment(newComment: Comment, note: Note): Boolean {
         for ((index, comment) in comments.withIndex()) {
             if (comment.noteId == newComment.noteId && comment.commentDeleteId && comment.commentId == newComment.commentId && note.noteDeleteId) {
-                comment.ownerId == newComment.ownerId
-                comment.date == newComment.date
-                comment.text == newComment.text
-                comment.ownerCommentId == newComment.ownerCommentId
+                comment.ownerId = newComment.ownerId
+                comment.date = newComment.date
+                comment.text = newComment.text
+                comment.ownerCommentId = newComment.ownerCommentId
                 comments[index] = newComment.copy()
                 return true
 
@@ -69,22 +69,51 @@ object NoteService {
     }
 
 
-    private fun deleteNote(noteId: Int, note: Note, comment: Comment) {
+    fun deleteNote(noteId: Int, note: Note, comment: Comment) {
         if (note.noteId == noteId && note.noteDeleteId) notes[noteId] = note.copy(noteDeleteId = true)
         else throw NoteNotFoundException("Note is deleted yet")
 
     }
 
-    private fun deleteComment(noteId: Int, comment: Comment, note: Note) {
+    fun deleteComment(noteId: Int, comment: Comment, note: Note) {
         if (comment.noteId == noteId && comment.commentDeleteId && note.noteDeleteId) comments[noteId] =
             comment.copy(commentDeleteId = true)
         else throw NoteNotFoundException("Comment is deleted yet")
 
     }
 
-    private fun restoreComment(comment: Comment, note: Note) {
-        if (!comment.commentDeleteId && note.noteDeleteId) comment else throw CommentNotFoundException("Comment not found")
+    fun restoreComment(comment: Comment, note: Note) {
+        if (!comment.commentDeleteId && note.noteDeleteId) comment.commentDeleteId =
+            false else throw CommentNotFoundException("Comment not found")
     }
+
+    fun getNotes(note: Note, ownerId: Int): MutableList<Note> {
+        val list = mutableListOf<Note>()
+        val iterator = list.listIterator()
+        for (item in iterator) {
+            iterator.add(note)
+        }
+        return list
+    }
+
+    fun noteGetById(notes: MutableList<Note>): MutableList<Int> {
+        val noteId = mutableListOf<Int>()
+        for (note in notes) {
+            noteId.add(note.noteId)
+        }
+        return noteId
+
+    }
+
+    fun getComments(comment: Comment): MutableList<Comment> {
+        val list = mutableListOf<Comment>()
+        val iterator = list.listIterator()
+        for (item in iterator) {
+            iterator.add(comment)
+        }
+        return list
+    }
+
 }
 
 
