@@ -12,10 +12,9 @@ data class Note(
 data class Comment(
     val commentId: Int,
     var text: String,
-    var ownerId: Int,
+    var commentOwnerId: Int,
     var commentDeleteId: Boolean = false,
     val noteId: Int,
-    var ownerCommentId: Int,
     var date: Date
 )
 
@@ -24,7 +23,6 @@ object NoteService {
     private val notes = mutableListOf<Note>()
     private val comments = mutableListOf<Comment>()
     private var count = 0
-
     fun addNote(note: Note): Note {
         notes += note.copy(noteId = count++)
         return notes.last()
@@ -56,10 +54,9 @@ object NoteService {
     fun editComment(newComment: Comment, note: Note): Boolean {
         for ((index, comment) in comments.withIndex()) {
             if (comment.noteId == newComment.noteId && comment.commentDeleteId && comment.commentId == newComment.commentId && note.noteDeleteId) {
-                comment.ownerId = newComment.ownerId
+                comment.commentOwnerId = newComment.commentOwnerId
                 comment.date = newComment.date
                 comment.text = newComment.text
-                comment.ownerCommentId = newComment.ownerCommentId
                 comments[index] = newComment.copy()
                 return true
 
@@ -87,21 +84,25 @@ object NoteService {
             false else throw CommentNotFoundException("Comment not found")
     }
 
-    fun getNotes(note: Note, ownerId: Int): MutableList<Note> {
-        val list = mutableListOf<Note>()
-        val iterator = list.listIterator()
-        for (item in iterator) {
-            iterator.add(note)
+    fun getNotes(note: Note, ownerId: Int): MutableList<Note>{
+        val resultList = mutableListOf<Note>()
+        for (n in notes) {
+            if (n.ownerId == ownerId) {
+                resultList.add(n)
+            }
         }
-        return list
+        return resultList
+
     }
 
-    fun noteGetById(notes: MutableList<Note>): MutableList<Int> {
-        val noteId = mutableListOf<Int>()
+    fun getNoteById(noteId:Int): MutableList<Note> {
+        val noteIds = mutableListOf<Note>()
         for (note in notes) {
-            noteId.add(note.noteId)
+            if(note.noteId == noteId) {
+                noteIds.add(note)
+            }
         }
-        return noteId
+        return noteIds
 
     }
 

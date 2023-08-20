@@ -30,10 +30,9 @@ class NoteServiceTest {
         val comment = Comment(
             commentId = 2,
             text = "blabla",
-            ownerId = 5,
+            commentOwnerId = 5,
             commentDeleteId = false,
             noteId = 1,
-            ownerCommentId = 3,
             date = Date()
         )
         NoteService.createComment(1, comment)
@@ -63,32 +62,15 @@ class NoteServiceTest {
         val comment = Comment (
             commentId = 2,
             text = "blabla",
-            ownerId = 5,
+            commentOwnerId = 5,
             commentDeleteId = false,
             noteId = 1,
-            ownerCommentId = 3,
             date = Date()
                 )
         NoteService.createComment(1,comment)
-        val editComment = Comment(2, "dfdsf", 5, false, 1,3,date=Date())
+        val editComment = Comment(2, "dfdsf", 5, false, 1,date=Date())
         val note = Note(2, "sdasd", "sdadsa", 2, true, date = Date())
         val res = NoteService.editComment(editComment, note)
         assertTrue(res)
-    }
-
-    @Test
-    fun getNote() {
-    }
-
-    @Test
-    fun getNoteById() {
-    }
-
-    @Test
-    fun getComment() {
-    }
-
-    @Test
-    fun restoreComment() {
     }
 }
